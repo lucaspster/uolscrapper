@@ -5,5 +5,5 @@ O projeto retorna algumas notícias do site uol.com.br
 
 Conhecendo o Cheerio
 
-1 - npm install
-2 - npm start
+- npm install
+- npm start
