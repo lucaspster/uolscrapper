@@ -4,26 +4,37 @@ const url = "https://www.uol.com.br";
 
 async function fetchData(url) {
   console.log("Buscando as Últimas Notícias...");
-  let res = await axios(url).catch((err) => console.log(err));
-  if (res.status !== 200) {
-    console.log("Erro ao baixar os arquivos");
-    return;
+  try {
+    const res = await axios.get(url);
+    if (res.status !== 200) {
+      console.log("Erro ao baixar os arquivos");
+      return;
+    }
+    return res.data;
+  } catch (err) {
+    console.error("Erro ao fazer a requisição:", err.message);
   }
-  return res;
 }
 
-fetchData(url).then((res) => {
-  const html = res.data;
+fetchData(url).then((html) => {
+  if (!html) {
+    console.log("Nenhum dado retornado");
+    return;
+  }
+
   const $ = cheerio.load(html);
   const ultimas_noticias = $(
-    "#corpo > div:nth-child(1) > div > div.topo-hibrido-central.centraliza.clearfix.bloco-editorial-topo-1 > div.topo-hibrido-hardnews > div.topo-hibrido-hardnews-col1 > div"
+    ".topo-hibrido-hardnews-col1 .chamada-hardnews"
   );
 
-  ultimas_noticias.each(function (i) {
-    let title = $(this).text().trim();
-    let imagem = $(this).find("img").attr("data-src");
-    console.log(`======================`);
-    console.log(title + `\n`);
-    console.log(imagem ? imagem : "Não contém imagem" + `\n`);
+  ultimas_noticias.each(function (i, element) {
+    let title = $(this).find(".chamada-hardnews-title").text().trim();
+    let imagem = $(this).find("img").attr("data-src") || "Não contém imagem";
+    let link = $(this).find("a").attr("href") || "Não contém link";
+
+    console.log("======================");
+    console.log(`Título: ${title}\n`);
+    console.log(`Imagem: ${imagem}\n`);
+    console.log(`Link: ${link}\n`);
   });
 });
